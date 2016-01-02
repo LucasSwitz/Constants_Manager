@@ -51,13 +51,14 @@ public class MainFrame extends JFrame {
             menu = new JPopupMenu();
 
             addEntry = new JMenuItem();
-            addEntry.setAction(new AddEntryAction());
+            addEntry.setAction(new AddEntryAction("Add Entry"));
             menu.add(addEntry);
 
             deleteEntry = new JMenuItem();
-            deleteEntry.setAction(new DeleteEntryAction());
+            deleteEntry.setAction(new DeleteEntryAction("Delete Entry"));
 
             editEntry = new JMenuItem();
+            editEntry.setAction(new EditEntryAction("Edit Entry"));
         }
 
         private void doPop(MouseEvent e)
@@ -71,6 +72,7 @@ public class MainFrame extends JFrame {
             {
                 if(constantsTable.getSelectedColumn() !=  -1)
                 {
+                    menu.add(editEntry);
                     menu.add(deleteEntry);
                 }
                 doPop(e);
@@ -108,25 +110,25 @@ public class MainFrame extends JFrame {
         }
     }
 
-    class AddEntryAction extends AbstractAction {
+    class EditEntryAction extends AbstractAction {
 
-        public AddEntryAction() {
-            super("Add Entry");
+        protected EditEntryFrame frame;
+        private int row;
+        public EditEntryAction(String name) {
+            super(name);
         }
-
         @Override
         public void actionPerformed(ActionEvent e) {
-            final EditEntryFrame frame = new EditEntryFrame("");
+            row = constantsTable.getSelectedRow();
+            initFrame();
             (new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    while (frame.isVisible())
-                    {
+                    while (frame.isVisible()) {
                         try {
                             Thread.sleep(10);
-                            if(frame.isValuesSet())
-                            {
-                                ((ContantsTableModel) constantsTable.getModel()).addSet(frame.getOutValues()[0], frame.getOutValues()[1]);
+                            if (frame.isValuesSet()) {
+                                editTable();
                                 break;
                             }
                         } catch (InterruptedException e1) {
@@ -134,15 +136,28 @@ public class MainFrame extends JFrame {
                         }
                     }
                 }
+
             })).start();
         }
+
+        protected void editTable() {
+            ((ContantsTableModel) constantsTable.getModel()).editSet(row, frame.getOutValues()[0], frame.getOutValues()[1]);
+        }
+
+        protected void initFrame() {
+            String[] vars = ((ContantsTableModel)constantsTable.getModel()).getSet(row);
+            frame = new EditEntryFrame("Edit Entry", vars);
+        }
+
+
     }
     class DeleteEntryAction extends AbstractAction
     {
-        public DeleteEntryAction()
+        public DeleteEntryAction(String name)
         {
-            super("Delete Entry");
+            super(name);
         }
+
         @Override
         public void actionPerformed(ActionEvent e) {
 
@@ -151,6 +166,25 @@ public class MainFrame extends JFrame {
             {
                 ((ContantsTableModel) constantsTable.getModel()).deleteSet(row);
             }
+        }
+    }
+
+    class AddEntryAction extends EditEntryAction
+    {
+        public AddEntryAction(String name)
+        {
+            super(name);
+        }
+        @Override
+        protected void initFrame()
+        {
+            frame = new EditEntryFrame("Add Entry");
+        }
+
+        @Override
+        protected void editTable()
+        {
+            ((ContantsTableModel) constantsTable.getModel()).addSet(frame.getOutValues()[0], frame.getOutValues()[1]);
         }
     }
 }

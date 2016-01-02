@@ -36,10 +36,18 @@ public class EditEntryFrame extends JFrame {
 
         initUIElements();
     }
+    public EditEntryFrame(String name,String[] vars)
+    {
+        super(name);
+        this.varName = vars[0];
+        this.varValue = vars[1];
+
+        initUIElements();
+    }
 
     private void initUIElements() {
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.setPreferredSize(new DimensionUIResource(400, 200));
+        this.setPreferredSize(new DimensionUIResource(200, 100));
         this.pack();
 
         JPanel panel = new JPanel();
@@ -53,8 +61,8 @@ public class EditEntryFrame extends JFrame {
         varNameBox.setText(varName);
         varValueBox.setText(varValue);
 
-        panel.add(varValueBox);
         panel.add(varNameBox);
+        panel.add(varValueBox);
 
         this.getContentPane().add(panel);
 
@@ -76,6 +84,9 @@ public class EditEntryFrame extends JFrame {
     {
         return outputValues;
     }
+
+
+
     class CustomWindowListener implements WindowListener
     {
 
