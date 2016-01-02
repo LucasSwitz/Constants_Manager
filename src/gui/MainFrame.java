@@ -26,11 +26,6 @@ public class MainFrame extends JFrame {
 
     private void initUIElements()
     {
-
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.pack();
-        this.setVisible(true);
-
         mainPanel = new JPanel();
         constantsTable = new JTable(new ContantsTableModel("C:\\Users\\Administrator\\Desktop\\Contants.txt"));
         tablePane = new JScrollPane(constantsTable);
@@ -38,6 +33,9 @@ public class MainFrame extends JFrame {
         this.getContentPane().add(mainPanel);
         mainPanel.add(tablePane);
 
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.pack();
+        this.setVisible(true);
 
         constantsTable.addMouseListener(new TableListener());
     }

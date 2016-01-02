@@ -1,9 +1,7 @@
 package gui;
 
 import javax.swing.table.AbstractTableModel;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 import java.util.ArrayList;
 
 /**
@@ -121,5 +119,35 @@ public class ContantsTableModel extends AbstractTableModel {
             }
         }
     }
-
+    public boolean outputModelToFile()
+    {
+        return outputModelToFile(file);
+    }
+    public boolean outputModelToFile(String pathToFile)
+    {
+        return outputModelToFile(new File(pathToFile));
+    }
+    public boolean outputModelToFile(File file)
+    {
+        char[] out = modelToCharArray();
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(out);
+            writer.close();
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+            return  false;
+        }
+        return true;
+    }
+    public char[] modelToCharArray()
+    {
+        String s = "";
+        for(int i =0; i < getRowCount();i++)
+        {
+            s += vars[0].get(i) + "=" + vars[1].get(i)+"\n";
+        }
+        return s.toCharArray();
+    }
 }

@@ -3,9 +3,7 @@ package gui;
 import javax.swing.*;
 import javax.swing.plaf.DimensionUIResource;
 import java.awt.*;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.awt.event.WindowStateListener;
+import java.awt.event.*;
 
 /**
  * Created by Administrator on 1/2/2016.
@@ -14,6 +12,7 @@ public class EditEntryFrame extends JFrame {
 
     private JTextField varNameBox;
     private JTextField varValueBox;
+    private JButton okayButton;
     private String varName = "";
     private String varValue = "";
 
@@ -55,6 +54,8 @@ public class EditEntryFrame extends JFrame {
         varNameBox = new JTextField();
         varValueBox = new JTextField();
 
+        okayButton = new JButton("OK");
+
         varNameBox.setPreferredSize(INPUT_BOX_DIMENSION);
         varValueBox.setPreferredSize(INPUT_BOX_DIMENSION);
 
@@ -63,12 +64,12 @@ public class EditEntryFrame extends JFrame {
 
         panel.add(varNameBox);
         panel.add(varValueBox);
+        panel.add(okayButton);
 
         this.getContentPane().add(panel);
-
         this.setVisible(true);
 
-        this.addWindowListener(new CustomWindowListener());
+        okayButton.addMouseListener(new ConfirmationButtonListener());
     }
 
     private void setOutValues(String varName,String varValue)
@@ -85,46 +86,37 @@ public class EditEntryFrame extends JFrame {
         return outputValues;
     }
 
-
-
-    class CustomWindowListener implements WindowListener
+    private void killWindow()
     {
-
-        @Override
-        public void windowOpened(WindowEvent e) {
-
-        }
-
-        @Override
-        public void windowClosing(WindowEvent e) {
+        this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+    }
+    public class ConfirmationButtonListener implements MouseListener
+    {
+       @Override
+        public void mouseClicked(MouseEvent e) {
             if(!varNameBox.getText().isEmpty() && !varValueBox.getText().isEmpty())
-            setOutValues(varNameBox.getText(),varValueBox.getText());
+                setOutValues(varNameBox.getText(),varValueBox.getText());
+                killWindow();
         }
 
         @Override
-        public void windowClosed(WindowEvent e) {
-
-        }
-
-        @Override
-        public void windowIconified(WindowEvent e) {
+        public void mousePressed(MouseEvent e) {
 
         }
 
         @Override
-        public void windowDeiconified(WindowEvent e) {
+        public void mouseReleased(MouseEvent e) {
 
         }
 
         @Override
-        public void windowActivated(WindowEvent e) {
+        public void mouseEntered(MouseEvent e) {
 
         }
 
         @Override
-        public void windowDeactivated(WindowEvent e) {
+        public void mouseExited(MouseEvent e) {
 
         }
     }
-
 }
