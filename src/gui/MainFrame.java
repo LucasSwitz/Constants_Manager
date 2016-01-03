@@ -1,10 +1,14 @@
 package gui;
 
+import javafx.stage.FileChooser;
+
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import javax.swing.plaf.DimensionUIResource;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.io.File;
 
 /**
  * Created by Administrator on 1/1/2016.
@@ -18,11 +22,18 @@ public class MainFrame extends JFrame {
     public MainFrame(String name, int width, int height)
     {
         super(name);
-        this.setPreferredSize(new DimensionUIResource(width,height));
-
         initUIElements();
+        initMenuBar();
+        initFrame(width,height);
     }
 
+    private void initFrame(int width, int height)
+    {
+        this.setPreferredSize(new DimensionUIResource(width,height));
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.pack();
+        this.setVisible(true);
+    }
 
     private void initUIElements()
     {
@@ -33,11 +44,46 @@ public class MainFrame extends JFrame {
         this.getContentPane().add(mainPanel);
         mainPanel.add(tablePane);
 
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.pack();
-        this.setVisible(true);
-
         constantsTable.addMouseListener(new TableListener());
+    }
+
+    private void initMenuBar()
+    {
+        JMenuBar bar = new JMenuBar();
+        JMenu file = new JMenu("File");
+        JMenuItem save = new JMenuItem("Save");
+        JMenuItem open = new JMenuItem("Open...");
+
+        JMenu table = new JMenu("Table");
+        JMenuItem ftp = new JMenuItem("FTP...");
+
+        save.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ((ContantsTableModel)constantsTable.getModel()).outputModelToFile();
+            }
+        });
+
+        open.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fc = new JFileChooser();
+                fc.setCurrentDirectory(new File(System.getProperty("user.home")));
+
+                int returnVal = fc.showOpenDialog((JMenuItem)e.getSource());
+
+                if(returnVal == JFileChooser.APPROVE_OPTION) {
+                    ((ContantsTableModel) constantsTable.getModel()).loadFile(fc.getSelectedFile());
+                }
+            }
+        });
+
+        file.add(save);
+        file.add(open);
+        bar.add(file);
+
+        setJMenuBar(bar);
+
     }
     class TableListener implements MouseInputListener
     {

@@ -18,21 +18,26 @@ public class ContantsTableModel extends AbstractTableModel {
     }
 
     public ContantsTableModel(File file) {
-        setFile(file);
+
+        this();
+
+        setCurrentFile(file);
+        loadFile(file);
+    }
+
+    public ContantsTableModel()
+    {
         vars = new ArrayList[2];
 
         vars[0] = new ArrayList<String>();
         vars[1] = new ArrayList<String>();
-
-        readIn(file);
     }
-
     @Override
     public String getColumnName(int i) {
         return columnNames[i];
     }
 
-    public void setFile(File file) {
+    public void setCurrentFile(File file) {
         this.file = file;
     }
 
@@ -45,12 +50,21 @@ public class ContantsTableModel extends AbstractTableModel {
         return vars.length;
     }
 
+    private void clearTable()
+    {
+        vars[0].clear();
+        vars[1].clear();
+    }
+
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         return vars[columnIndex].get(rowIndex);
     }
 
-    private boolean readIn(File file) {
+    public boolean loadFile(File file) {
+        if(vars[0].size() != 0 && vars[1].size() != 0) {clearTable();}
+        if(file != this.file) {setCurrentFile(file);}
+
         char inVarsBuf[] = new char[2048];
         try {
             new BufferedReader(new FileReader(file)).read(inVarsBuf);
@@ -59,6 +73,7 @@ public class ContantsTableModel extends AbstractTableModel {
             System.out.println("Error Loading File: " + file.getName());
             return false;
         }
+        this.fireTableDataChanged();
         return true;
 
     }
@@ -97,6 +112,8 @@ public class ContantsTableModel extends AbstractTableModel {
         for (int i = 0; i < varsIn.length; i++) {
             char c = varsIn[i];
             switch (c) {
+                case '\r':
+                    break;
                 case '\n':
                     currentValue = currentData;
                     addSet(currentVar, currentValue);
@@ -146,7 +163,7 @@ public class ContantsTableModel extends AbstractTableModel {
         String s = "";
         for(int i =0; i < getRowCount();i++)
         {
-            s += vars[0].get(i) + "=" + vars[1].get(i)+"\n";
+            s += vars[0].get(i) + "=" + vars[1].get(i) +"\r\n";
         }
         return s.toCharArray();
     }
