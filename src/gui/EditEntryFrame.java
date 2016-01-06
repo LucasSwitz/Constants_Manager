@@ -3,31 +3,30 @@ package gui;
 import javax.swing.*;
 import javax.swing.plaf.DimensionUIResource;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
 
 /**
  * Created by Administrator on 1/2/2016.
  */
 public class EditEntryFrame extends JFrame {
 
+    private final Dimension INPUT_BOX_DIMENSION = new Dimension(70, 20);
     private JTextField varNameBox;
     private JTextField varValueBox;
     private JButton okayButton;
     private String varName = "";
     private String varValue = "";
+    private String[] outputValues = {null, null};
 
-    private String[] outputValues = {null,null};
-
-    private final Dimension INPUT_BOX_DIMENSION = new Dimension(70,20);
-
-    public EditEntryFrame(String name)
-    {
+    public EditEntryFrame(String name) {
         super(name);
 
         initUIElements();
     }
-    public EditEntryFrame(String name, String varName, String varValue)
-    {
+
+    public EditEntryFrame(String name, String varName, String varValue) {
         super(name);
 
         this.varName = varName;
@@ -35,8 +34,8 @@ public class EditEntryFrame extends JFrame {
 
         initUIElements();
     }
-    public EditEntryFrame(String name,String[] vars)
-    {
+
+    public EditEntryFrame(String name, String[] vars) {
         super(name);
         this.varName = vars[0];
         this.varValue = vars[1];
@@ -72,31 +71,29 @@ public class EditEntryFrame extends JFrame {
         okayButton.addMouseListener(new ConfirmationButtonListener());
     }
 
-    private void setOutValues(String varName,String varValue)
-    {
+    private void setOutValues(String varName, String varValue) {
         outputValues[0] = varName;
         outputValues[1] = varValue;
     }
-    public boolean isValuesSet()
-    {
+
+    public boolean isValuesSet() {
         return outputValues[0] != null && outputValues[1] != null;
     }
-    public String[] getOutValues()
-    {
+
+    public String[] getOutValues() {
         return outputValues;
     }
 
-    private void killWindow()
-    {
+    private void killWindow() {
         this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
     }
-    public class ConfirmationButtonListener implements MouseListener
-    {
-       @Override
+
+    public class ConfirmationButtonListener implements MouseListener {
+        @Override
         public void mouseClicked(MouseEvent e) {
-            if(!varNameBox.getText().isEmpty() && !varValueBox.getText().isEmpty())
-                setOutValues(varNameBox.getText(),varValueBox.getText());
-                killWindow();
+            if (!varNameBox.getText().isEmpty() && !varValueBox.getText().isEmpty())
+                setOutValues(varNameBox.getText(), varValueBox.getText());
+            killWindow();
         }
 
         @Override

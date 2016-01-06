@@ -92,7 +92,7 @@ public abstract class ConstantsManager {
         }
         else
         {
-            //Congrats! You invented a new type.
+
         }
     }
     private static void addBool(String name, Boolean bool)

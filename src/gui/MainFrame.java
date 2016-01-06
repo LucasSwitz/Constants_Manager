@@ -1,7 +1,5 @@
 package gui;
 
-import javafx.stage.FileChooser;
-
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import javax.swing.plaf.DimensionUIResource;
@@ -15,28 +13,27 @@ import java.io.File;
  */
 public class MainFrame extends JFrame {
 
+    private static final int TABLE_MARGIN = 10;
     private JPanel mainPanel;
     private JScrollPane tablePane;
     private JTable constantsTable;
 
-    public MainFrame(String name, int width, int height)
-    {
+    public MainFrame(String name, int width, int height) {
         super(name);
-        initUIElements();
+        initFrame(width, height);
         initMenuBar();
-        initFrame(width,height);
+        initUIElements();
+        this.setVisible(true);
+
     }
 
-    private void initFrame(int width, int height)
-    {
-        this.setPreferredSize(new DimensionUIResource(width,height));
+    private void initFrame(int width, int height) {
+        this.setPreferredSize(new DimensionUIResource(width, height));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
-        this.setVisible(true);
     }
 
-    private void initUIElements()
-    {
+    private void initUIElements() {
         mainPanel = new JPanel();
         constantsTable = new JTable(new ContantsTableModel("C:\\Users\\Administrator\\Desktop\\Contants.txt"));
         tablePane = new JScrollPane(constantsTable);
@@ -47,8 +44,7 @@ public class MainFrame extends JFrame {
         constantsTable.addMouseListener(new TableListener());
     }
 
-    private void initMenuBar()
-    {
+    private void initMenuBar() {
         JMenuBar bar = new JMenuBar();
         JMenu file = new JMenu("File");
         JMenuItem save = new JMenuItem("Save");
@@ -56,42 +52,48 @@ public class MainFrame extends JFrame {
 
         JMenu table = new JMenu("Table");
         JMenuItem ftp = new JMenuItem("FTP...");
+        JMenuItem newEntry = new JMenuItem("New Entry");
 
-        save.addActionListener(new ActionListener(){
+        save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ((ContantsTableModel)constantsTable.getModel()).outputModelToFile();
+                ((ContantsTableModel) constantsTable.getModel()).outputModelToFile();
             }
         });
 
-        open.addActionListener(new ActionListener(){
+        open.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fc = new JFileChooser();
                 fc.setCurrentDirectory(new File(System.getProperty("user.home")));
 
-                int returnVal = fc.showOpenDialog((JMenuItem)e.getSource());
+                int returnVal = fc.showOpenDialog((JMenuItem) e.getSource());
 
-                if(returnVal == JFileChooser.APPROVE_OPTION) {
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
                     ((ContantsTableModel) constantsTable.getModel()).loadFile(fc.getSelectedFile());
                 }
             }
         });
 
+        newEntry.setAction(new AddEntryAction("Add Entry"));
+
         file.add(save);
         file.add(open);
+
+        table.add(newEntry);
+
         bar.add(file);
+        bar.add(table);
 
         setJMenuBar(bar);
 
     }
-    class TableListener implements MouseInputListener
-    {
-        JPopupMenu menu;
-        JMenuItem addEntry,deleteEntry,editEntry;
 
-        public TableListener()
-        {
+    class TableListener implements MouseInputListener {
+        JPopupMenu menu;
+        JMenuItem addEntry, deleteEntry, editEntry;
+
+        public TableListener() {
             menu = new JPopupMenu();
 
             addEntry = new JMenuItem();
@@ -105,17 +107,15 @@ public class MainFrame extends JFrame {
             editEntry.setAction(new EditEntryAction("Edit Entry"));
         }
 
-        private void doPop(MouseEvent e)
-        {
-            menu.show(e.getComponent(),e.getX(),e.getY());
+        private void doPop(MouseEvent e) {
+            menu.show(e.getComponent(), e.getX(), e.getY());
         }
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            if(e.getButton() == MouseEvent.BUTTON3)
-            {
-                if(constantsTable.getSelectedColumn() !=  -1)
-                {
+            if (e.getButton() == MouseEvent.BUTTON3) {
+                //make sure a column is actually selected
+                if (constantsTable.getSelectedColumn() != -1) {
                     menu.add(editEntry);
                     menu.add(deleteEntry);
                 }
@@ -158,9 +158,11 @@ public class MainFrame extends JFrame {
 
         protected EditEntryFrame frame;
         private int row;
+
         public EditEntryAction(String name) {
             super(name);
         }
+
         @Override
         public void actionPerformed(ActionEvent e) {
             row = constantsTable.getSelectedRow();
@@ -189,16 +191,15 @@ public class MainFrame extends JFrame {
         }
 
         protected void initFrame() {
-            String[] vars = ((ContantsTableModel)constantsTable.getModel()).getSet(row);
+            String[] vars = ((ContantsTableModel) constantsTable.getModel()).getSet(row);
             frame = new EditEntryFrame("Edit Entry", vars);
         }
 
 
     }
-    class DeleteEntryAction extends AbstractAction
-    {
-        public DeleteEntryAction(String name)
-        {
+
+    class DeleteEntryAction extends AbstractAction {
+        public DeleteEntryAction(String name) {
             super(name);
         }
 
@@ -206,28 +207,24 @@ public class MainFrame extends JFrame {
         public void actionPerformed(ActionEvent e) {
 
             int row = constantsTable.getSelectedRow();
-            if (row != -1)
-            {
+            if (row != -1) {
                 ((ContantsTableModel) constantsTable.getModel()).deleteSet(row);
             }
         }
     }
 
-    class AddEntryAction extends EditEntryAction
-    {
-        public AddEntryAction(String name)
-        {
+    class AddEntryAction extends EditEntryAction {
+        public AddEntryAction(String name) {
             super(name);
         }
+
         @Override
-        protected void initFrame()
-        {
+        protected void initFrame() {
             frame = new EditEntryFrame("Add Entry");
         }
 
         @Override
-        protected void editTable()
-        {
+        protected void editTable() {
             ((ContantsTableModel) constantsTable.getModel()).addSet(frame.getOutValues()[0], frame.getOutValues()[1]);
         }
     }

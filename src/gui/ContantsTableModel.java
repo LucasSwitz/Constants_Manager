@@ -25,13 +25,13 @@ public class ContantsTableModel extends AbstractTableModel {
         loadFile(file);
     }
 
-    public ContantsTableModel()
-    {
+    public ContantsTableModel() {
         vars = new ArrayList[2];
 
         vars[0] = new ArrayList<String>();
         vars[1] = new ArrayList<String>();
     }
+
     @Override
     public String getColumnName(int i) {
         return columnNames[i];
@@ -50,8 +50,7 @@ public class ContantsTableModel extends AbstractTableModel {
         return vars.length;
     }
 
-    private void clearTable()
-    {
+    private void clearTable() {
         vars[0].clear();
         vars[1].clear();
     }
@@ -62,8 +61,12 @@ public class ContantsTableModel extends AbstractTableModel {
     }
 
     public boolean loadFile(File file) {
-        if(vars[0].size() != 0 && vars[1].size() != 0) {clearTable();}
-        if(file != this.file) {setCurrentFile(file);}
+        if (vars[0].size() != 0 && vars[1].size() != 0) {
+            clearTable();
+        }
+        if (file != this.file) {
+            setCurrentFile(file);
+        }
 
         char inVarsBuf[] = new char[2048];
         try {
@@ -123,7 +126,7 @@ public class ContantsTableModel extends AbstractTableModel {
                     currentVar = currentData;
                     currentData = "";
                     break;
-                case (char)0:
+                case (char) 0:
                     //removes null characters from input
                     break;
                 default:
@@ -136,34 +139,32 @@ public class ContantsTableModel extends AbstractTableModel {
             }
         }
     }
-    public boolean outputModelToFile()
-    {
+
+    public boolean outputModelToFile() {
         return outputModelToFile(file);
     }
-    public boolean outputModelToFile(String pathToFile)
-    {
+
+    public boolean outputModelToFile(String pathToFile) {
         return outputModelToFile(new File(pathToFile));
     }
-    public boolean outputModelToFile(File file)
-    {
+
+    public boolean outputModelToFile(File file) {
         char[] out = modelToCharArray();
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             writer.write(out);
             writer.close();
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
-            return  false;
+            return false;
         }
         return true;
     }
-    public char[] modelToCharArray()
-    {
+
+    public char[] modelToCharArray() {
         String s = "";
-        for(int i =0; i < getRowCount();i++)
-        {
-            s += vars[0].get(i) + "=" + vars[1].get(i) +"\r\n";
+        for (int i = 0; i < getRowCount(); i++) {
+            s += vars[0].get(i) + "=" + vars[1].get(i) + "\r\n";
         }
         return s.toCharArray();
     }
