@@ -36,10 +36,15 @@ public class MainFrame extends JFrame {
     private void initUIElements() {
         mainPanel = new JPanel();
         constantsTable = new JTable(new ContantsTableModel("C:\\Users\\Administrator\\Desktop\\Contants.txt"));
+
+        JTable testTable = new JTable(new ContantsTableModel("C:\\Users\\Administrator\\Desktop\\C2.txt"));
+        JScrollPane testPane = new JScrollPane(testTable);
+
         tablePane = new JScrollPane(constantsTable);
 
         this.getContentPane().add(mainPanel);
         mainPanel.add(tablePane);
+        mainPanel.add(testPane);
 
         constantsTable.addMouseListener(new TableListener());
     }
@@ -191,8 +196,8 @@ public class MainFrame extends JFrame {
         }
 
         protected void initFrame() {
-            String[] vars = ((ContantsTableModel) constantsTable.getModel()).getSet(row);
-            frame = new EditEntryFrame("Edit Entry", vars);
+            ConstantsTableSet set = ((ContantsTableModel) constantsTable.getModel()).getSet(row);
+            frame = new EditEntryFrame(set);
         }
 
 
@@ -225,7 +230,7 @@ public class MainFrame extends JFrame {
 
         @Override
         protected void editTable() {
-            ((ContantsTableModel) constantsTable.getModel()).addSet(frame.getOutValues()[0], frame.getOutValues()[1]);
+            ((ContantsTableModel) constantsTable.getModel()).addSet(new ConstantsTableSet(frame.getOutValues()[0], frame.getOutValues()[1]));
         }
     }
 }

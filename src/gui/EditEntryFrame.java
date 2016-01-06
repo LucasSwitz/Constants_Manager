@@ -26,21 +26,20 @@ public class EditEntryFrame extends JFrame {
         initUIElements();
     }
 
-    public EditEntryFrame(String name, String varName, String varValue) {
-        super(name);
+    public EditEntryFrame(String varName, String varValue) {
+        super(varName);
 
         this.varName = varName;
         this.varValue = varValue;
 
         initUIElements();
     }
-
-    public EditEntryFrame(String name, String[] vars) {
-        super(name);
-        this.varName = vars[0];
-        this.varValue = vars[1];
-
-        initUIElements();
+    public EditEntryFrame(ConstantsTableSet set)
+    {
+        this(set.getName(),set.getValue());
+    }
+    public EditEntryFrame(String[] vars) {
+        this(vars[0],vars[1]);
     }
 
     private void initUIElements() {

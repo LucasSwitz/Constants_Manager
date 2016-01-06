@@ -11,7 +11,7 @@ public class ContantsTableModel extends AbstractTableModel {
 
     private final String[] columnNames = {"names", "values"};
     private File file;
-    private ArrayList<String> vars[];
+    private ArrayList<ConstantsTableSet> vars;
 
     public ContantsTableModel(String filePath) {
         this(new File(filePath));
@@ -26,10 +26,7 @@ public class ContantsTableModel extends AbstractTableModel {
     }
 
     public ContantsTableModel() {
-        vars = new ArrayList[2];
-
-        vars[0] = new ArrayList<String>();
-        vars[1] = new ArrayList<String>();
+        vars = new ArrayList<>();
     }
 
     @Override
@@ -42,26 +39,25 @@ public class ContantsTableModel extends AbstractTableModel {
     }
 
     public int getRowCount() {
-        return vars[0].size();
+        return vars.size();
     }
 
     @Override
     public int getColumnCount() {
-        return vars.length;
+        return vars.get(0).getAll().size();
     }
 
     private void clearTable() {
-        vars[0].clear();
-        vars[1].clear();
+        vars.clear();
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        return vars[columnIndex].get(rowIndex);
+        return vars.get(rowIndex).getColumnVal(columnIndex);
     }
 
     public boolean loadFile(File file) {
-        if (vars[0].size() != 0 && vars[1].size() != 0) {
+        if (vars.size() != 0) {
             clearTable();
         }
         if (file != this.file) {
@@ -81,29 +77,36 @@ public class ContantsTableModel extends AbstractTableModel {
 
     }
 
-    public void addSet(String var, String value) {
-        vars[0].add(var);
-        vars[1].add(value);
+    public void addSet(ConstantsTableSet set)
+    {
+        vars.add(set);
+        fireTableRowsInserted(vars.size() - 1, vars.size() - 1);
 
-        fireTableRowsInserted(vars[0].size() - 1, vars[0].size() - 1);
     }
 
-    public String[] getSet(int row) {
-        return new String[]{vars[0].get(row), vars[1].get(row)};
+    public void addSet(String name, String value, ConstantsTableSet.Status status) {
+        addSet(new ConstantsTableSet(name,value,status));
     }
 
-    public void editSet(int row, String var, String value) {
-        if (var != vars[0].get(row))
-            vars[0].set(row, var);
-        if (value != vars[1].get(row))
-            vars[1].set(row, value);
+    public ConstantsTableSet getSet(int row) {
+        return vars.get(row);
+    }
+
+    public void editSet(int row, String name, String value) {
+
+        if (name != vars.get(row).getName())
+            vars.get(row).setName(name);
+        if (value != vars.get(row).getValue())
+            vars.get(row).setValue(value);
+
+        System.out.println(row);
+
         this.fireTableRowsUpdated(row, row);
 
     }
 
     public void deleteSet(int row) {
-        vars[0].remove(row);
-        vars[1].remove(row);
+        vars.remove(row);
         this.fireTableRowsDeleted(row, row);
     }
 
@@ -119,12 +122,15 @@ public class ContantsTableModel extends AbstractTableModel {
                     break;
                 case '\n':
                     currentValue = currentData;
-                    addSet(currentVar, currentValue);
+                    addSet(new ConstantsTableSet(currentVar, currentValue, ConstantsTableSet.Status.SUCCESS));
                     currentData = "";
                     break;
                 case '=':
                     currentVar = currentData;
                     currentData = "";
+                    break;
+                case '~':
+                    addBrokenRuntimeVar(currentVar);
                     break;
                 case (char) 0:
                     //removes null characters from input
@@ -134,12 +140,16 @@ public class ContantsTableModel extends AbstractTableModel {
 
                     if (i + 1 == varsIn.length) {
                         currentValue = currentData;
-                        addSet(currentVar, currentValue);
+                        addSet(new ConstantsTableSet(currentVar,currentValue, ConstantsTableSet.Status.SUCCESS));
                     }
             }
         }
     }
 
+    private void addBrokenRuntimeVar(String name)
+    {
+
+    }
     public boolean outputModelToFile() {
         return outputModelToFile(file);
     }
@@ -164,7 +174,7 @@ public class ContantsTableModel extends AbstractTableModel {
     public char[] modelToCharArray() {
         String s = "";
         for (int i = 0; i < getRowCount(); i++) {
-            s += vars[0].get(i) + "=" + vars[1].get(i) + "\r\n";
+            s += vars.get(i).getName() + "=" + vars.get(i).getValue() + "\r\n";
         }
         return s.toCharArray();
     }

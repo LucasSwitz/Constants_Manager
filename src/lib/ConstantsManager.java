@@ -1,11 +1,8 @@
-package robot;
+package lib;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
 
 /**
  * Created by Administrator on 1/3/2016.
@@ -14,15 +11,69 @@ public abstract class ConstantsManager {
 
     private static File file;
     private static HashMap<String,Object> map = new HashMap<>();
+    public static ArrayList<String> failedVars = new ArrayList<>();
 
-    public static void setFile(File file){
+    public static void loadFile(File file)
+    {
         ConstantsManager.file = file;
+
+        resetMaps();
         readFile();
+        updateUsers();
+        printRuntimeFile();
     }
 
+    private  static void resetMaps()
+    {
+        map.clear();
+        failedVars.clear();
+    }
+    private static void updateUsers()
+    {
+        for(ConstantsUser user : ConstantsUser.users)
+        {
+            try {
+                user.loadConstants();
+            }catch (Exception e)
+            {
+                e.printStackTrace();
+                user.loadDefaults();
+            }
+        }
+    }
+
+    private static void printRuntimeFile()
+    {
+        char[] out = mapsToRuntimeFile();
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(out);
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+          }
+    }
+    private static char[] mapsToRuntimeFile()
+    {
+        String s = "";
+        for (int i = 0; i < map.size(); i++) {
+            String currentKey = map.keySet().iterator().next();
+            s += currentKey + "=" + map.get(currentKey) + "\r\n";
+        }
+
+        for(String var: failedVars)
+        {
+            s+='~'+var;
+        }
+        return s.toCharArray();
+    }
     public static boolean isFileSet(){return file!=null;}
 
     private static void readFile()
+    {
+        readFile(ConstantsManager.file);
+    }
+    private static void readFile(File file)
     {
         char[] chars = new char[2048];
         try {
@@ -113,8 +164,20 @@ public abstract class ConstantsManager {
     }
     private static boolean isDataLegal(String name,Class clazz)
     {
-        return (map.get(name)!=null && map.get(name).getClass() == clazz);
+
+        if(map.get(name) == null || map.get(name).getClass() != clazz)
+        {
+            addFailedVar(name);
+            return false;
+        }
+        return true;
     }
+
+    private static void addFailedVar(String name)
+    {
+        failedVars.add(name);
+    }
+
     private static Object getData(String name, Class clazz) throws IllegalArgumentException
     {
         if(isDataLegal(name,clazz)) {
@@ -136,9 +199,5 @@ public abstract class ConstantsManager {
     public static int getInt(String name) {
         return  (int)(Integer)getData(name, Integer.class);
     }
-    public static boolean getBool(String name) {
-        return  (boolean)(Boolean)getData(name, Boolean.class);
-    }
-
-
+    public static boolean getBool(String name) {return  (boolean)(Boolean)getData(name, Boolean.class);}
 }
